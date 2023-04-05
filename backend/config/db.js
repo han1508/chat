@@ -1,19 +1,24 @@
-const mongoose = require("mongoose");
-const colors = require("colors");
+const { Sequelize } = require('sequelize');
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: true,
-    });
+const sequelize = new Sequelize(
+  'chat',
+  'root',
+  'mysql',
+   {
+     host: 'localhost',
+     dialect: 'mysql'
+   }
+);
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`.cyan.underline);
-  } catch (error) {
-    console.log(`Error: ${error.message}`.red.bold);
-    process.exit();
-  }
+function connectDB() {
+  sequelize.authenticate().then(() => {
+    console.log('DB connection has been established successfully.');
+  }).catch((error) => {
+    console.error('Unable to connect to the database: ', error);
+  });
+}
+
+module.exports = {
+  connectDB,
+  sequelize,
 };
-
-module.exports = connectDB;

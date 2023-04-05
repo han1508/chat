@@ -1,39 +1,46 @@
-const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const { DataTypes, Model } = require("sequelize");
+const { sequelize } = require("../config/db");
 
-const userSchema = mongoose.Schema(
-  {
-    name: { type: "String", required: true },
-    email: { type: "String", unique: true, required: true },
-    password: { type: "String", required: true },
-    pic: {
-      type: "String",
-      required: true,
-      default:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    isAdmin: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
+class User extends Model {
+  async matchPassword(enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+  };
+}
+
+User.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
-  { timestaps: true }
-);
-
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
-
-userSchema.pre("save", async function (next) {
-  if (!this.isModified) {
-    next();
-  }
-
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  pic: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  isAdmin: {
+    type: DataTypes.TINYINT,
+    allowNull: false,
+  },
+}, {
+  sequelize,
+  modelName: 'User',
+  tableName: 'users',
+  underscored: true
 });
 
-const User = mongoose.model("User", userSchema);
+User.beforeCreate(async (user, options) => {
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(user.password, salt);
+});
+
 
 module.exports = User;
