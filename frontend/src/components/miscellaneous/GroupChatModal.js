@@ -54,6 +54,7 @@ const GroupChatModal = ({ children }) => {
     try {
       setLoading(true);
       const config = {
+        baseURL: 'http://localhost:3001',
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -92,6 +93,7 @@ const GroupChatModal = ({ children }) => {
 
     try {
       const config = {
+        baseURL: 'http://localhost:3001',
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -171,11 +173,11 @@ const GroupChatModal = ({ children }) => {
             ) : (
               searchResult
                 ?.slice(0, 4)
-                .map((user) => (
+                .map((it) => (
                   <UserListItem
-                    key={user._id}
-                    user={user}
-                    handleFunction={() => handleGroup(user)}
+                    key={it._id}
+                    user={it}
+                    handleFunction={() => handleGroup(it)}
                   />
                 ))
             )}

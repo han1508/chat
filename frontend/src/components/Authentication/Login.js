@@ -34,6 +34,7 @@ const Login = () => {
     // console.log(email, password);
     try {
       const config = {
+        baseURL: 'http://localhost:3001',
         headers: {
           "Content-type": "application/json",
         },

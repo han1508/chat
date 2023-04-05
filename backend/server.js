@@ -1,4 +1,5 @@
 const express = require("express");
+var cors = require('cors');
 const connectDB = require("./config/db");
 const dotenv = require("dotenv");
 const userRoutes = require("./routes/userRoutes");
@@ -10,6 +11,7 @@ const path = require("path");
 dotenv.config();
 connectDB();
 const app = express();
+app.use(cors());
 
 app.use(express.json()); // to accept json data
 

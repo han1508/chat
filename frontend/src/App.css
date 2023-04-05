@@ -8,6 +8,10 @@
   background-size: cover;
 }
 
+body{
+  color: black !important;
+}
+
 ::-webkit-scrollbar {
   width: 0px;
 }

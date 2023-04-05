@@ -46,6 +46,7 @@ const Signup = () => {
     console.log(name, email, password, pic);
     try {
       const config = {
+        baseURL: 'http://localhost:3001',
         headers: {
           "Content-type": "application/json",
         },

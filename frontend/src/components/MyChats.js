@@ -20,6 +20,7 @@ const MyChats = ({ fetchAgain }) => {
     // console.log(user._id);
     try {
       const config = {
+        baseURL: 'http://localhost:3001',
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

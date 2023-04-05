@@ -15,7 +15,7 @@ import animationData from "../animations/typing.json";
 import io from "socket.io-client";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
-const ENDPOINT = "http://localhost:5000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+const ENDPOINT = "http://localhost:3001"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -43,6 +43,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     try {
       const config = {
+        baseURL: 'http://localhost:3001',
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -75,6 +76,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       socket.emit("stop typing", selectedChat._id);
       try {
         const config = {
+          baseURL: 'http://localhost:3001',
           headers: {
             "Content-type": "application/json",
             Authorization: `Bearer ${user.token}`,
