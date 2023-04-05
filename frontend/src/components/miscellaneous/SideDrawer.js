@@ -72,6 +72,7 @@ function SideDrawer() {
       setLoading(true);
 
       const config = {
+        baseURL: 'http://localhost:3001',
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -99,6 +100,7 @@ function SideDrawer() {
     try {
       setLoadingChat(true);
       const config = {
+        baseURL: 'http://localhost:3001',
         headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${user.token}`,
