@@ -16,7 +16,7 @@ const allUsers = asyncHandler(async (req, res) => {
   //     }
   //   : {};
 
-  // const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+  // const users = await User.find(keyword).find({ id: { $ne: req.user.id } });
   const keyword = req.query.search;
   let userEntity;
   if (!String(keyword).trim()) {
@@ -33,7 +33,7 @@ const allUsers = asyncHandler(async (req, res) => {
   const users = userEntity
     .map(ent => ent.toJSON())
     .map(usr => {
-      usr._id = usr.id;
+      usr.id = usr.id;
       delete usr.id;
       return usr;
     })
@@ -70,7 +70,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (user) {
     res.status(201).json({
-      _id: user.id,
+      id: user.id,
       name: user.name,
       email: user.email,
       // isAdmin: user.isAdmin,
@@ -95,7 +95,7 @@ const authUser = asyncHandler(async (req, res) => {
 
   if (user && (await user.matchPassword(password))) {
     res.json({
-      _id: user.id,
+      id: user.id,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,

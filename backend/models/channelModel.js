@@ -17,9 +17,9 @@ const Channel = sequelize.define("Channel", {
     type: DataTypes.TINYINT,
     allowNull: false,
   },
-  latestMessageId: {
-    type: DataTypes.INTEGER,
-  },
+  // latestMessageId: {
+  //   type: DataTypes.INTEGER,
+  // },
   adminId: {
     type: DataTypes.INTEGER,
   },
@@ -30,7 +30,9 @@ const Channel = sequelize.define("Channel", {
 });
 
 
-Channel.Messages = Channel.hasMany(Message, { as: 'messages' });
+// Channel.Messages = Channel.hasMany(Message, { as: 'messages' });
+Message.belongsTo(Channel, { as: 'channel' });
+// Channel.hasOne(Message, { as: 'latestMessage' });
 // User.Admin = User.hasMany(Channel, { as: 'admin' });
 Channel.Admin = Channel.belongsTo(User, { as: 'admin' });
 

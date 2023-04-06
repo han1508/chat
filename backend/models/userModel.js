@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const { DataTypes, Model } = require("sequelize");
+
 const { sequelize } = require("../config/db");
+const { Message } = require('./messageModel');
 
 class User extends Model {
   async matchPassword(enteredPassword) {
@@ -47,6 +49,7 @@ User.beforeCreate(async (user, options) => {
   user.password = await bcrypt.hash(user.password, salt);
 });
 
+Message.belongsTo(User, { as: 'sender' });
 
 module.exports = {
   User,

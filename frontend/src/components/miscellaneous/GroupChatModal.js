@@ -76,7 +76,7 @@ const GroupChatModal = ({ children }) => {
   };
 
   const handleDelete = (delUser) => {
-    setSelectedUsers(selectedUsers.filter((sel) => sel._id !== delUser._id));
+    setSelectedUsers(selectedUsers.filter((sel) => sel.id !== delUser.id));
   };
 
   const handleSubmit = async () => {
@@ -102,7 +102,7 @@ const GroupChatModal = ({ children }) => {
         `/api/chat/group`,
         {
           name: groupChatName,
-          users: JSON.stringify(selectedUsers.map((u) => u._id)),
+          users: JSON.stringify(selectedUsers.map((u) => u.id)),
         },
         config
       );
@@ -161,7 +161,7 @@ const GroupChatModal = ({ children }) => {
             <Box w="100%" d="flex" flexWrap="wrap">
               {selectedUsers.map((u) => (
                 <UserBadgeItem
-                  key={u._id}
+                  key={u.id}
                   user={u}
                   handleFunction={() => handleDelete(u)}
                 />
@@ -175,7 +175,7 @@ const GroupChatModal = ({ children }) => {
                 ?.slice(0, 4)
                 .map((it) => (
                   <UserListItem
-                    key={it._id}
+                    key={it.id}
                     user={it}
                     handleFunction={() => handleGroup(it)}
                   />

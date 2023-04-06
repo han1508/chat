@@ -19,7 +19,7 @@ const Message = sequelize.define("Message", {
     type: DataTypes.INTEGER,
   },
 }, {
-  tableName: 'channels',
+  tableName: 'messages',
   underscored: true,
   timestamps: false,
 });

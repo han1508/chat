@@ -17,7 +17,7 @@ const MyChats = ({ fetchAgain }) => {
   const toast = useToast();
 
   const fetchChats = async () => {
-    // console.log(user._id);
+    // console.log(user.id);
     try {
       const config = {
         baseURL: 'http://localhost:3001',
@@ -99,7 +99,7 @@ const MyChats = ({ fetchAgain }) => {
                 px={3}
                 py={2}
                 borderRadius="lg"
-                key={chat._id}
+                key={chat.id}
               >
                 <Text>
                   {!chat.isGroupChat
