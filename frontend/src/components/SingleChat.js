@@ -228,9 +228,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               (!selectedChat.isGroupChat ? (
                 <>
                   {getSender(user, selectedChat.users)}
-                  <ProfileModal
+                  {/* <ProfileModal
                     user={getSenderFull(user, selectedChat.users)}
-                  />
+                  /> */}
+                  <Button onClick={() => handleRemove(user)} colorScheme="red">
+                    Leave Chat
+                  </Button>
                 </>
               ) : (
                 <>

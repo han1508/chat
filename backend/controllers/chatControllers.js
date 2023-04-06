@@ -35,21 +35,6 @@ const accessChat = asyncHandler(async (req, res) => {
     ch => ch.users.length === 1 && ch.users[0].id === theirUserId
   );
 
-  // var isChat = await Channel.find({
-  //   isGroupChat: false,
-  //   $and: [
-  //     { users: { $elemMatch: { $eq: req.user.id } } },
-  //     { users: { $elemMatch: { $eq: userId } } },
-  //   ],
-  // })
-  //   .populate("users", "-password")
-  //   .populate("latestMessage");
-
-  // isChat = await User.populate(isChat, {
-  //   path: "latestMessage.sender",
-  //   select: "name pic email",
-  // });
-
   if (channelWithThem) {
     res.send(channelWithThem);
     return;
@@ -61,11 +46,6 @@ const accessChat = asyncHandler(async (req, res) => {
       adminId: myUserId,
     });
     await createdChannel.setUsers([myUserId, theirUserId]);
-
-    // const FullChat = await Channel.findOne({ id: createdChat.id }).populate(
-    //   "users",
-    //   "-password"
-    // );
 
     const fullChannelEntity = await Channel.findByPk(createdChannel.id, {
       include: [
@@ -112,38 +92,10 @@ const fetchChats = asyncHandler(async (req, res) => {
             },
           ],
         },
-        // {
-        //   model: User,
-        //   include: [
-        //     {
-        //       model: User,
-        //       as: 'users',
-        //       through: ChannelUser,
-        //       attributes: { exclude: ['password'] },
-        //     },
-        //   ],
-        // },
       ],
     });
     const channels = channelUserEntities.map(c => c.Channel.toJSON());
-    // console.log('fetchChat channels:', JSON.stringify(channels));
 
-    // const channelEntities = await Channel.findAll({
-    //   include: [
-    //     {
-    //       model: User,
-    //       as: 'users',
-    //       through: ChannelUser,
-    //       attributes: { exclude: ['password'] },
-    //       where: { id: req.user.id }
-    //     },
-    //   ],
-    // });
-    // const channels = channelEntities.map(c => c.toJSON());
-    // console.log('fetchChat channels:', channels);
-
-    // const user = userEntity.toJSON();
-    // console.log('fetchChat result:', user);
     res.status(200).send(channels);
   } catch (error) {
     res.status(400);
@@ -195,12 +147,11 @@ const createGroupChat = asyncHandler(async (req, res) => {
           as: 'users',
           through: ChannelUser,
           attributes: { exclude: ['password'] },
-        },
-        {
+        },{
           model: User,
-          as: 'admin',
+          as: 'groupAdmin',
           attributes: { exclude: ['password'] },
-        }
+        },
       ],
     });
     const fullChannel = fullChannelEntity.toJSON();
@@ -243,14 +194,6 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     });
   }
   res.status(200).end();
-
-  // if (!removed) {
-  //   res.status(404);
-  //   throw new Error("Chat Not Found");
-  // } else {
-  //   // res.json(removed);
-  //   res.end();
-  // }
 });
 
 module.exports = {
