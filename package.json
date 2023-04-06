@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "PORT=3001 JWT_SECRET=850210499635462 node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "dev-hannah": "PORT=3001 JWT_SECRET=850210499635462 nodemon backend/server.js"
   },
   "keywords": [
     "mern",
