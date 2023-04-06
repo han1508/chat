@@ -6,49 +6,86 @@ const { User } = require("../models/userModel");
 //@route           POST /api/chat/
 //@access          Protected
 const accessChat = asyncHandler(async (req, res) => {
-  const { userId } = req.body;
+  const { userId: theirUserId } = req.body;
+  const myUserId = req.user.id;
 
-  if (!userId) {
+  if (!theirUserId) {
     console.log("UserId param not sent with request");
     return res.sendStatus(400);
   }
 
-  var isChat = await Channel.find({
-    isGroupChat: false,
-    $and: [
-      { users: { $elemMatch: { $eq: req.user.id } } },
-      { users: { $elemMatch: { $eq: userId } } },
+  const channelUserEntities = await ChannelUser.findAll({
+    where: { userId: myUserId },
+    include: [
+      {
+        model: Channel,
+          include: [
+            {
+              model: User,
+              as: 'users',
+              through: ChannelUser,
+              attributes: { exclude: ['password'] },
+            },
+          ],
+      },
     ],
-  })
-    .populate("users", "-password")
-    .populate("latestMessage");
-
-  isChat = await User.populate(isChat, {
-    path: "latestMessage.sender",
-    select: "name pic email",
   });
+  const myChannels = channelUserEntities.map(c => c.Channel.toJSON());
+  const channelWithThem = myChannels.find(
+    ch => ch.users.length === 1 && ch.users[0].id === theirUserId
+  );
 
-  if (isChat.length > 0) {
-    res.send(isChat[0]);
-  } else {
-    var chatData = {
+  // var isChat = await Channel.find({
+  //   isGroupChat: false,
+  //   $and: [
+  //     { users: { $elemMatch: { $eq: req.user.id } } },
+  //     { users: { $elemMatch: { $eq: userId } } },
+  //   ],
+  // })
+  //   .populate("users", "-password")
+  //   .populate("latestMessage");
+
+  // isChat = await User.populate(isChat, {
+  //   path: "latestMessage.sender",
+  //   select: "name pic email",
+  // });
+
+  if (channelWithThem) {
+    res.send(channelWithThem);
+    return;
+  }
+  try {
+    const createdChannel = await Channel.create({
       chatName: "sender",
       isGroupChat: false,
-      users: [req.user.id, userId],
-    };
+      adminId: myUserId,
+    });
+    await createdChannel.setUsers([myUserId, theirUserId]);
 
-    try {
-      const createdChat = await Channel.create(chatData);
-      const FullChat = await Channel.findOne({ id: createdChat.id }).populate(
-        "users",
-        "-password"
-      );
-      res.status(200).json(FullChat);
-    } catch (error) {
-      res.status(400);
-      throw new Error(error.message);
-    }
+    // const FullChat = await Channel.findOne({ id: createdChat.id }).populate(
+    //   "users",
+    //   "-password"
+    // );
+
+    const fullChannelEntity = await Channel.findByPk(createdChannel.id, {
+      include: [
+        {
+          model: User,
+          as: 'users',
+          through: ChannelUser,
+          attributes: { exclude: ['password'] },
+        },
+      ],
+    });
+    const fullChannel = fullChannelEntity.toJSON();
+
+    res.status(200).json(fullChannel);
+  } catch (error) {
+    res.status(400);
+    console.error(error);
+    throw new Error(error.message);
   }
+
 });
 
 //@description     Fetch all chats for a user
@@ -56,14 +93,6 @@ const accessChat = asyncHandler(async (req, res) => {
 //@access          Protected
 const fetchChats = asyncHandler(async (req, res) => {
   try {
-    const userEntity = await User.findByPk(req.user.id, {
-      include: {
-        model: Channel,
-        through: ChannelUser,
-        as: 'channels',
-      },
-    })
-
     const channelUserEntities = await ChannelUser.findAll({
       where: { userId: req.user.id },
       include: [
@@ -135,10 +164,10 @@ const createGroupChat = asyncHandler(async (req, res) => {
 
     // console.log('createGroupChat created channel ID:', channel.id);
     
-    channelUsers = users.map(usrId => ({
-      channelId: channel.id,
-      userId: usrId,
-    }));
+    // channelUsers = users.map(usrId => ({
+    //   channelId: channel.id,
+    //   userId: usrId,
+    // }));
     // console.log('createGroupChat channelUsers:', channelUsers);
 
     await channel.setUsers(users);

@@ -14,7 +14,7 @@ const Channel = sequelize.define("Channel", {
     allowNull: false,
   },
   isGroupChat: {
-    type: DataTypes.TINYINT,
+    type: DataTypes.BOOLEAN,
     allowNull: false,
   },
   // latestMessageId: {
