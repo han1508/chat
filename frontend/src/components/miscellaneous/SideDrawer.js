@@ -149,31 +149,6 @@ function SideDrawer() {
         </Text>
         <div>
           <Menu>
-            <MenuButton p={1}>
-              <NotificationBadge
-                count={notification.length}
-                effect={Effect.SCALE}
-              />
-              <BellIcon fontSize="2xl" m={1} />
-            </MenuButton>
-            <MenuList pl={2}>
-              {!notification.length && "No New Messages"}
-              {notification.map((notif) => (
-                <MenuItem
-                  key={notif.id}
-                  onClick={() => {
-                    setSelectedChat(notif.channel);
-                    setNotification(notification.filter((n) => n !== notif));
-                  }}
-                >
-                  {notif.channel.isGroupChat
-                    ? `New Message in ${notif.channel.chatName}`
-                    : `New Message from ${getSender(user, notif.channel.users)}`}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-          <Menu>
             <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
               <Avatar
                 size="sm"
@@ -182,7 +157,7 @@ function SideDrawer() {
                 src={user.pic}
               />
             </MenuButton>
-            <MenuList>
+            <MenuList backgroundColor="white">
               <ProfileModal user={user}>
                 <MenuItem>My Profile</MenuItem>{" "}
               </ProfileModal>
@@ -197,12 +172,13 @@ function SideDrawer() {
       <Drawer  placement="left" onClose={onClose} isOpen={isOpen}>
 
         <DrawerOverlay/>
-        <DrawerContent backgroundColor='white'>
+        <DrawerContent backgroundColor='white' >
           <DrawerHeader borderBottomWidth="1px" >Search Users</DrawerHeader>
           <DrawerBody backgroundColor='white'>
-            <Box d="flex" pb={2}>
+            <Box d="flex" pb={1}  >
               <Input
-                variant = 'outline'
+                variant = 'solid'
+                border="1px"
                 placeholder="Search by name or email"
                 mr={2}
                 value={search}
