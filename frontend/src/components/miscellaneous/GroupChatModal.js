@@ -109,7 +109,7 @@ const GroupChatModal = ({ children }) => {
       setChats([data, ...chats]);
       onClose();
       toast({
-        title: "New Group Chat Created!",
+        title: "New Channel Created!",
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -140,13 +140,13 @@ const GroupChatModal = ({ children }) => {
             d="flex"
             justifyContent="center"
           >
-            Create Group Chat
+            Create Channel
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody d="flex" flexDir="column" alignItems="center">
             <FormControl>
               <Input
-                placeholder="Chat Name"
+                placeholder="Channel Name"
                 mb={3}
                 onChange={(e) => setGroupChatName(e.target.value)}
               />
@@ -168,7 +168,7 @@ const GroupChatModal = ({ children }) => {
               ))}
             </Box>
             {loading ? (
-              // <ChatLoading />
+              // <ChannelLoading />
               <div>Loading...</div>
             ) : (
               searchResult
@@ -184,7 +184,7 @@ const GroupChatModal = ({ children }) => {
           </ModalBody>
           <ModalFooter>
             <Button onClick={handleSubmit} colorScheme="blue">
-              Create Chat
+              Create Channel
             </Button>
           </ModalFooter>
         </ModalContent>

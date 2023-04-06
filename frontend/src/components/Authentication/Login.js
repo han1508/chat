@@ -115,7 +115,7 @@ const Login = () => {
           setPassword("123456");
         }}
       >
-        Get Guest User Credentials
+        Admin User
       </Button>
     </VStack>
   );
