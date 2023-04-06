@@ -196,7 +196,7 @@ function SideDrawer() {
 
       <Drawer  placement="left" onClose={onClose} isOpen={isOpen}>
 
-        <DrawerOverlay backgroundColor='white'/>
+        <DrawerOverlay/>
         <DrawerContent backgroundColor='white'>
           <DrawerHeader borderBottomWidth="1px" >Search Users</DrawerHeader>
           <DrawerBody backgroundColor='white'>
