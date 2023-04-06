@@ -17,22 +17,21 @@ const Channel = sequelize.define("Channel", {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
-  // latestMessageId: {
-  //   type: DataTypes.INTEGER,
-  // },
+  latestMessageId: {
+    type: DataTypes.INTEGER,
+  },
   adminId: {
     type: DataTypes.INTEGER,
   },
 }, {
   tableName: 'channels',
   underscored: true,
-  timestamps: false,
 });
 
 
 // Channel.Messages = Channel.hasMany(Message, { as: 'messages' });
 Message.belongsTo(Channel, { as: 'channel' });
-// Channel.hasOne(Message, { as: 'latestMessage' });
+Channel.belongsTo(Message, { as: 'latestMessage' });
 // User.Admin = User.hasMany(Channel, { as: 'admin' });
 Channel.belongsTo(User, { as: 'groupAdmin', foreignKey: 'admin_id' });
 

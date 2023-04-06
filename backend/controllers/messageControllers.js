@@ -14,6 +14,7 @@ const allMessages = asyncHandler(async (req, res) => {
     //   .populate("chat");
     const messageEntities = await Message.findAll({
       where: { channelId: req.params.chatId },
+      order: [['createdAt', 'ASC']],
       include: [
         {
           model: User,
@@ -37,21 +38,27 @@ const allMessages = asyncHandler(async (req, res) => {
 //@route           POST /api/Message/
 //@access          Protected
 const sendMessage = asyncHandler(async (req, res) => {
-  const { content, chatId } = req.body;
+  const { content, chatId: channelId } = req.body;
 
-  if (!content || !chatId) {
+  if (!content || !channelId) {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
   }
 
   var newMessage = {
     content: content,
-    channelId: chatId,
+    channelId: channelId,
     senderId: req.user.id,
   };
 
   try {
     const newMsgEntity = await Message.create(newMessage);
+  
+    await Channel.update({
+      latestMessageId: newMsgEntity.id,
+    }, {
+      where: { id: channelId, }
+    })
 
     const fullMsgEntity = await Message.findByPk(newMsgEntity.id, {
       include: [

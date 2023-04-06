@@ -30,7 +30,7 @@ import NotificationBadge from "react-notification-badge";
 import { Effect } from "react-notification-badge";
 import { getSender } from "../../config/ChatLogics";
 import UserListItem from "../userAvatar/UserListItem";
-import { ChatState } from "../../Context/ChatProvider";
+import { useChatState } from "../../Context/ChatProvider";
 
 
 function SideDrawer() {
@@ -46,7 +46,7 @@ function SideDrawer() {
     setNotification,
     chats,
     setChats,
-  } = ChatState();
+  } = useChatState();
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();

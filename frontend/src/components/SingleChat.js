@@ -13,7 +13,7 @@ import Lottie from "react-lottie";
 import animationData from "../animations/typing.json";
 
 import io from "socket.io-client";
-import { ChatState } from "../Context/ChatProvider";
+import { useChatState } from "../Context/ChatProvider";
 const ENDPOINT = "http://localhost:3001"; // "https://chat.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 
@@ -35,7 +35,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     },
   };
   const { selectedChat, setSelectedChat, user, notification, setNotification } =
-    ChatState();
+    useChatState();
 
   const fetchMessages = async () => {
     if (!selectedChat) return;

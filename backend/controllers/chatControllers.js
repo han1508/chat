@@ -19,14 +19,14 @@ const accessChat = asyncHandler(async (req, res) => {
     include: [
       {
         model: Channel,
-          include: [
-            {
-              model: User,
-              as: 'users',
-              through: ChannelUser,
-              attributes: { exclude: ['password'] },
-            },
-          ],
+        include: [
+          {
+            model: User,
+            as: 'users',
+            through: ChannelUser,
+            attributes: { exclude: ['password'] },
+          },
+        ],
       },
     ],
   });
@@ -78,6 +78,7 @@ const fetchChats = asyncHandler(async (req, res) => {
       include: [
         {
           model: Channel,
+          order: [['updatedAt', 'DESC']],
           include: [
             {
               model: User,
@@ -188,7 +189,7 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     ],
   });
 
-  if (channelEntity.users && channelEntity.users.length <= 1) {
+  if (channelEntity.users?.length <= 1) {
     await Channel.destroy({
       where: { id: channelId },
     });

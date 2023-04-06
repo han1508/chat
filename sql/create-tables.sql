@@ -11,14 +11,16 @@ CREATE TABLE `users` (
 
 CREATE TABLE `channels` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `chat_name` varchar(100) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `chat_name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `is_group_chat` tinyint DEFAULT '0',
   `latest_message_id` int DEFAULT NULL,
   `admin_id` int NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `fk_channel_user_id_idx` (`admin_id`),
   CONSTRAINT `fk_channel_user_id` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 CREATE TABLE `channel_user` (
   `channel_id` int NOT NULL,

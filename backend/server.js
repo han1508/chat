@@ -75,15 +75,15 @@ io.on("connection", (socket) => {
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
-  socket.on("new message", (newMessageRecieved) => {
-    var { channel } = newMessageRecieved;
+  socket.on("new message", (newMessageReceived) => {
+    var { channel } = newMessageReceived;
 
     if (!channel.users) return console.log("chat.users not defined");
 
     channel.users.forEach((user) => {
-      if (user.id == newMessageRecieved.sender.id) return;
+      if (user.id == newMessageReceived.sender.id) return;
 
-      socket.in(user.id).emit("message recieved", newMessageRecieved);
+      socket.in(user.id).emit("message recieved", newMessageReceived);
     });
   });
 

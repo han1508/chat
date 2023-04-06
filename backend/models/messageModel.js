@@ -18,6 +18,9 @@ const Message = sequelize.define("Message", {
   channelId: {
     type: DataTypes.INTEGER,
   },
+  createdAt: {
+    type: DataTypes.DATE,
+  },
 }, {
   tableName: 'messages',
   underscored: true,
