@@ -9,16 +9,25 @@ A chatting app. Uses Socket.io for real time communication and stores user detai
 
 **Server:** Node JS, Express JS
 
-**Database:** Mongo DB
-  
+**Database:** MySQL
 
-Go to the project directory
+### **Run database Docker container**
+
+```bash
+docker run --name mysqldb -e MYSQL_ROOT_PASSWORD=mysql -p 3306:3306 -d mysql:latest
+```
+
+Note that my application uses username `root` and password `mysql`.
+
+### **Run the application**
+
+* Go to the project directory
 
 ```bash
   cd chat
 ```
 
-Install dependencies
+* Install dependencies (Must use YARN)
 
 ```bash
   yarn install
@@ -29,12 +38,13 @@ Install dependencies
   yarn install
 ```
 
-Start the server
+* Start the server
 
 ```bash
-  yarn dev
+  yarn start
 ```
-Start the Client
+
+* Start the Client
 
 ```bash
   //open now terminal
