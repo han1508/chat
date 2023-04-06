@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const asyncHandler = require("express-async-handler");
 const { User } = require("../models/userModel");
 const generateToken = require("../config/generateToken");
@@ -6,16 +7,37 @@ const generateToken = require("../config/generateToken");
 //@route           GET /api/user?search=
 //@access          Public
 const allUsers = asyncHandler(async (req, res) => {
-  const keyword = req.query.search
-    ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-        ],
-      }
-    : {};
+  // const keyword = req.query.search
+  //   ? {
+  //       $or: [
+  //         { name: { $regex: req.query.search, $options: "i" } },
+  //         { email: { $regex: req.query.search, $options: "i" } },
+  //       ],
+  //     }
+  //   : {};
 
-  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+  // const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+  const keyword = req.query.search;
+  let userEntity;
+  if (!String(keyword).trim()) {
+    userEntity = await User.findAll();
+  } else {
+    userEntity = await User.findAll({
+      where: {
+        name: {
+          [Op.like]: `%${keyword}%`
+        }
+      }
+    });
+  }
+  const users = userEntity
+    .map(ent => ent.toJSON())
+    .map(usr => {
+      usr._id = usr.id;
+      delete usr.id;
+      return usr;
+    })
+  // console.log('allUsers users:', users);
   res.send(users);
 });
 
@@ -30,7 +52,9 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Please Enter all the Feilds");
   }
 
-  const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({ where: { email } }, {
+    attributes: { exclude: ['password'] },
+  });
 
   if (userExists) {
     res.status(400);
@@ -65,7 +89,9 @@ const registerUser = asyncHandler(async (req, res) => {
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ where: { email } }, {
+    attributes: { exclude: ['password'] },
+  });
 
   if (user && (await user.matchPassword(password))) {
     res.json({

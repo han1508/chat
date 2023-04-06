@@ -56,20 +56,20 @@ const accessChat = asyncHandler(async (req, res) => {
 //@access          Protected
 const fetchChats = asyncHandler(async (req, res) => {
   try {
-    Channel.find({ users: { $elemMatch: { $eq: req.user._id } } })
-      .populate("users", "-password")
-      .populate("groupAdmin", "-password")
-      .populate("latestMessage")
-      .sort({ updatedAt: -1 })
-      .then(async (results) => {
-        results = await User.populate(results, {
-          path: "latestMessage.sender",
-          select: "name pic email",
-        });
-        res.status(200).send(results);
-      });
+    const userEntity = await User.findByPk(req.user.id, {
+      include: {
+        model: Channel,
+        through: ChannelUser,
+        as: 'channels',
+      },
+    })
+
+    const user = userEntity.toJSON();
+    console.log('fetchChat result:', user);
+    res.status(200).send(user.channels);
   } catch (error) {
     res.status(400);
+    console.error(error);
     throw new Error(error.message);
   }
 });
@@ -90,38 +90,48 @@ const createGroupChat = asyncHandler(async (req, res) => {
       .send("2 or more users (including you) are required to form a group chat");
   }
 
-  users.push(req.user);
+  users.push(req.user.id);
 
   try {
     const channel = await Channel.create({
       chatName: req.body.name,
       // users: users,
       isGroupChat: true,
-      groupAdmin: req.user,
+      adminId: req.user.id,
     });
 
-    channelUsers = users.map(usr => ({
+    console.log('createGroupChat created channel ID:', channel.id);
+    
+    channelUsers = users.map(usrId => ({
       channelId: channel.id,
-      userId: usr.id,
+      userId: usrId,
     }));
+    console.log('createGroupChat channelUsers:', channelUsers);
 
-    await ChannelUser.bulkCreate(channelUsers);
+    await channel.setUsers(users);
 
-    const fullGroupChat = await Channel.findByPk(channel.id, {
-      include: [{
-        model: User,
-        as: 'users',
-      }, {
-        model: Channel.Admin,
-        as: 'admin',
-      }],
+    const fullChannelEntity = await Channel.findByPk(channel.id, {
+      include: [
+        {
+          model: User,
+          as: 'users',
+          through: ChannelUser,
+          attributes: { exclude: ['password'] },
+        },
+        {
+          model: User,
+          as: 'admin',
+          attributes: { exclude: ['password'] },
+        }
+      ],
     });
-      // .populate("users", "-password")
-      // .populate("groupAdmin", "-password");
+    const fullChannel = fullChannelEntity.toJSON();
 
-    res.status(200).json(fullGroupChat);
+    console.log('createGroupChat fullChannel:', fullChannel);
+    res.status(200).json(fullChannel);
   } catch (error) {
     res.status(400);
+    console.error(error)
     throw new Error(error.message);
   }
 });

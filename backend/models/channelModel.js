@@ -35,27 +35,24 @@ Channel.Messages = Channel.hasMany(Message, { as: 'messages' });
 Channel.Admin = Channel.belongsTo(User, { as: 'admin' });
 
 const ChannelUser = sequelize.define('ChannelUser', {
-  ChannelId: {
+  channelId: {
     type: DataTypes.INTEGER,
-    references: {
-      model: Channel,
-      key: 'id'
-    }
+    allowNull: true,
   },
-  UserId: {
+  userId: {
     type: DataTypes.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
+    allowNull: true,
   }
 }, {
   tableName: 'channel_user',
-  underscored: true
+  underscored: true,
+  timestamps: false,
 });
 
 Channel.belongsToMany(User, { as: 'users', through: ChannelUser });
 User.belongsToMany(Channel, { as: 'channels', through: ChannelUser });
+ChannelUser.belongsTo(Channel);
+ChannelUser.belongsTo(User);
 
 
 module.exports = {

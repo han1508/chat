@@ -31,7 +31,7 @@ User.init({
     allowNull: true,
   },
   isAdmin: {
-    type: DataTypes.TINYINT,
+    type: DataTypes.BOOLEAN,
     allowNull: true,
   },
 }, {
