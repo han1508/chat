@@ -2,7 +2,7 @@ import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./styles.css";
-import { IconButton, Spinner, useToast } from "@chakra-ui/react";
+import { Button, IconButton, Spinner, useToast } from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -13,7 +13,6 @@ import Lottie from "react-lottie";
 import animationData from "../animations/typing.json";
 
 import io from "socket.io-client";
-import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
 const ENDPOINT = "http://localhost:3001"; // "https://chat.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
@@ -160,6 +159,52 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }, timerLength);
   };
 
+  const handleRemove = async (user1) => {
+    if (selectedChat.groupAdmin.id !== user.id && user1.id !== user.id) {
+      toast({
+        title: "Only admins can remove someone!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const config = {
+        baseURL: 'http://localhost:3001',
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        `/api/chat/groupremove`,
+        {
+          chatId: selectedChat.id,
+          userId: user1.id,
+        },
+        config
+      );
+
+      user1.id === user.id ? setSelectedChat() : setSelectedChat(data);
+      setFetchAgain(!fetchAgain);
+      fetchMessages();
+      setLoading(false);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       {selectedChat ? (
@@ -190,11 +235,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               ) : (
                 <>
                   {selectedChat.chatName.toUpperCase()}
-                  <UpdateGroupChatModal
-                    fetchMessages={fetchMessages}
-                    fetchAgain={fetchAgain}
-                    setFetchAgain={setFetchAgain}
-                  />
+                  <Button onClick={() => handleRemove(user)} colorScheme="red">
+                    Leave Group
+                  </Button>
                 </>
               ))}
           </Text>

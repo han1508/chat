@@ -34,7 +34,7 @@ const Channel = sequelize.define("Channel", {
 Message.belongsTo(Channel, { as: 'channel' });
 // Channel.hasOne(Message, { as: 'latestMessage' });
 // User.Admin = User.hasMany(Channel, { as: 'admin' });
-Channel.Admin = Channel.belongsTo(User, { as: 'admin' });
+Channel.belongsTo(User, { as: 'groupAdmin', foreignKey: 'admin_id' });
 
 const ChannelUser = sequelize.define('ChannelUser', {
   channelId: {
