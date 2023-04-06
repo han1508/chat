@@ -30,13 +30,8 @@ const allUsers = asyncHandler(async (req, res) => {
       }
     });
   }
-  const users = userEntity
-    .map(ent => ent.toJSON())
-    .map(usr => {
-      usr.id = usr.id;
-      delete usr.id;
-      return usr;
-    })
+  const users = userEntity.map(ent => ent.toJSON())
+
   // console.log('allUsers users:', users);
   res.send(users);
 });

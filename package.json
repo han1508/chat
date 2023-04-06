@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "MONGO_URI=mongodb://localhost:27017 PORT=3001 JWT_SECRET=850210499635462 node backend/server.js",
+    "start": "PORT=3001 JWT_SECRET=850210499635462 node backend/server.js",
     "dev": "nodemon backend/server.js"
   },
   "keywords": [
