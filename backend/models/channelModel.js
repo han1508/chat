@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/db");
-const Message = require('./messageModel');
-const User = require('./userModel');
+const { Message } = require('./messageModel');
+const { User } = require('./userModel');
 
 const Channel = sequelize.define("Channel", {
   id: {
@@ -25,13 +25,14 @@ const Channel = sequelize.define("Channel", {
   },
 }, {
   tableName: 'channels',
-  underscored: true
+  underscored: true,
+  timestamps: false,
 });
 
-module.exports = Channel;
 
 Channel.Messages = Channel.hasMany(Message, { as: 'messages' });
-Channel.Admin = Channel.hasOne(User, { as: 'admin' });
+// User.Admin = User.hasMany(Channel, { as: 'admin' });
+Channel.Admin = Channel.belongsTo(User, { as: 'admin' });
 
 const ChannelUser = sequelize.define('ChannelUser', {
   ChannelId: {
@@ -48,7 +49,16 @@ const ChannelUser = sequelize.define('ChannelUser', {
       key: 'id'
     }
   }
+}, {
+  tableName: 'channel_user',
+  underscored: true
 });
 
-Channel.belongsToMany(User, { through: ChannelUser });
-User.belongsToMany(Channel, { through: ChannelUser });
+Channel.belongsToMany(User, { as: 'users', through: ChannelUser });
+User.belongsToMany(Channel, { as: 'channels', through: ChannelUser });
+
+
+module.exports = {
+  Channel,
+  ChannelUser,
+};

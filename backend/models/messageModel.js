@@ -20,7 +20,10 @@ const Message = sequelize.define("Message", {
   },
 }, {
   tableName: 'channels',
-  underscored: true
+  underscored: true,
+  timestamps: false,
 });
 
-module.exports = Message;
+module.exports = {
+  Message,
+};

@@ -14,6 +14,10 @@ User.init({
     primaryKey: true,
     autoIncrement: true,
   },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -24,17 +28,18 @@ User.init({
   },
   pic: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   isAdmin: {
     type: DataTypes.TINYINT,
-    allowNull: false,
+    allowNull: true,
   },
 }, {
   sequelize,
   modelName: 'User',
   tableName: 'users',
-  underscored: true
+  underscored: true,
+  timestamps: false,
 });
 
 User.beforeCreate(async (user, options) => {
@@ -43,4 +48,6 @@ User.beforeCreate(async (user, options) => {
 });
 
 
-module.exports = User;
+module.exports = {
+  User,
+};

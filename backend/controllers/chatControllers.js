@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
-const Chat = require("../models/channelModel");
-const User = require("../models/userModel");
+const { Channel, ChannelUser } = require("../models/channelModel");
+const { User } = require("../models/userModel");
 
 //@description     Create or fetch One to One Chat
 //@route           POST /api/chat/
@@ -13,7 +13,7 @@ const accessChat = asyncHandler(async (req, res) => {
     return res.sendStatus(400);
   }
 
-  var isChat = await Chat.find({
+  var isChat = await Channel.find({
     isGroupChat: false,
     $and: [
       { users: { $elemMatch: { $eq: req.user._id } } },
@@ -38,8 +38,8 @@ const accessChat = asyncHandler(async (req, res) => {
     };
 
     try {
-      const createdChat = await Chat.create(chatData);
-      const FullChat = await Chat.findOne({ _id: createdChat._id }).populate(
+      const createdChat = await Channel.create(chatData);
+      const FullChat = await Channel.findOne({ _id: createdChat._id }).populate(
         "users",
         "-password"
       );
@@ -56,7 +56,7 @@ const accessChat = asyncHandler(async (req, res) => {
 //@access          Protected
 const fetchChats = asyncHandler(async (req, res) => {
   try {
-    Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+    Channel.find({ users: { $elemMatch: { $eq: req.user._id } } })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
       .populate("latestMessage")
@@ -93,16 +93,31 @@ const createGroupChat = asyncHandler(async (req, res) => {
   users.push(req.user);
 
   try {
-    const groupChat = await Chat.create({
+    const channel = await Channel.create({
       chatName: req.body.name,
-      users: users,
+      // users: users,
       isGroupChat: true,
       groupAdmin: req.user,
     });
 
-    const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
-      .populate("users", "-password")
-      .populate("groupAdmin", "-password");
+    channelUsers = users.map(usr => ({
+      channelId: channel.id,
+      userId: usr.id,
+    }));
+
+    await ChannelUser.bulkCreate(channelUsers);
+
+    const fullGroupChat = await Channel.findByPk(channel.id, {
+      include: [{
+        model: User,
+        as: 'users',
+      }, {
+        model: Channel.Admin,
+        as: 'admin',
+      }],
+    });
+      // .populate("users", "-password")
+      // .populate("groupAdmin", "-password");
 
     res.status(200).json(fullGroupChat);
   } catch (error) {
@@ -117,7 +132,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
 const renameGroup = asyncHandler(async (req, res) => {
   const { chatId, chatName } = req.body;
 
-  const updatedChat = await Chat.findByIdAndUpdate(
+  const updatedChat = await Channel.findByIdAndUpdate(
     chatId,
     {
       chatName: chatName,
@@ -145,7 +160,7 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 
   // check if the requester is admin
 
-  const removed = await Chat.findByIdAndUpdate(
+  const removed = await Channel.findByIdAndUpdate(
     chatId,
     {
       $pull: { users: userId },
@@ -173,7 +188,7 @@ const addToGroup = asyncHandler(async (req, res) => {
 
   // check if the requester is admin
 
-  const added = await Chat.findByIdAndUpdate(
+  const added = await Channel.findByIdAndUpdate(
     chatId,
     {
       $push: { users: userId },
