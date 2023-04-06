@@ -98,15 +98,31 @@ const fetchChats = asyncHandler(async (req, res) => {
       include: [
         {
           model: Channel,
-            include: [
-              {
-                model: User,
-                as: 'users',
-                through: ChannelUser,
-                attributes: { exclude: ['password'] },
-              },
-            ],
+          include: [
+            {
+              model: User,
+              as: 'users',
+              through: ChannelUser,
+              attributes: { exclude: ['password'] },
+            },
+            {
+              model: User,
+              as: 'groupAdmin',
+              attributes: { exclude: ['password'] },
+            },
+          ],
         },
+        // {
+        //   model: User,
+        //   include: [
+        //     {
+        //       model: User,
+        //       as: 'users',
+        //       through: ChannelUser,
+        //       attributes: { exclude: ['password'] },
+        //     },
+        //   ],
+        // },
       ],
     });
     const channels = channelUserEntities.map(c => c.Channel.toJSON());
@@ -198,93 +214,48 @@ const createGroupChat = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Rename Group
-// @route   PUT /api/chat/rename
-// @access  Protected
-const renameGroup = asyncHandler(async (req, res) => {
-  const { chatId, chatName } = req.body;
-
-  const updatedChat = await Channel.findByIdAndUpdate(
-    chatId,
-    {
-      chatName: chatName,
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password");
-
-  if (!updatedChat) {
-    res.status(404);
-    throw new Error("Chat Not Found");
-  } else {
-    res.json(updatedChat);
-  }
-});
-
 // @desc    Remove user from Group
 // @route   PUT /api/chat/groupremove
 // @access  Protected
 const removeFromGroup = asyncHandler(async (req, res) => {
-  const { chatId, userId } = req.body;
+  const { chatId: channelId, userId } = req.body;
 
   // check if the requester is admin
 
-  const removed = await Channel.findByIdAndUpdate(
-    chatId,
-    {
-      $pull: { users: userId },
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password");
+  await ChannelUser.destroy({
+    where: { channelId, userId },
+  });
 
-  if (!removed) {
-    res.status(404);
-    throw new Error("Chat Not Found");
-  } else {
-    res.json(removed);
+  const channelEntity = await Channel.findByPk(channelId, {
+    include: [
+      {
+        model: User,
+        as: 'users',
+        through: ChannelUser,
+        attributes: { exclude: ['password'] },
+      },
+    ],
+  });
+
+  if (channelEntity.users && channelEntity.users.length <= 1) {
+    await Channel.destroy({
+      where: { id: channelId },
+    });
   }
-});
+  res.status(200).end();
 
-// @desc    Add user to Group / Leave
-// @route   PUT /api/chat/groupadd
-// @access  Protected
-const addToGroup = asyncHandler(async (req, res) => {
-  const { chatId, userId } = req.body;
-
-  // check if the requester is admin
-
-  const added = await Channel.findByIdAndUpdate(
-    chatId,
-    {
-      $push: { users: userId },
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password");
-
-  if (!added) {
-    res.status(404);
-    throw new Error("Chat Not Found");
-  } else {
-    res.json(added);
-  }
+  // if (!removed) {
+  //   res.status(404);
+  //   throw new Error("Chat Not Found");
+  // } else {
+  //   // res.json(removed);
+  //   res.end();
+  // }
 });
 
 module.exports = {
   accessChat,
   fetchChats,
   createGroupChat,
-  renameGroup,
-  addToGroup,
   removeFromGroup,
 };
